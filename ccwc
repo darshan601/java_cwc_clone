@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# ccwc - A Java implementation of the Unix wc command
+# Usage: ./ccwc [options] filename
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+JAR_PATH="$SCRIPT_DIR/target/ccwc-1.0.0.jar"
+
+if [ ! -f "$JAR_PATH" ]; then
+    echo "Error: JAR file not found. Please run 'mvn package' first."
+    exit 1
+fi
+
+java -jar "$JAR_PATH" "$@"
