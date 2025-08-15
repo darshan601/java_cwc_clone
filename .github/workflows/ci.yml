@@ -1,0 +1,60 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        java-version: [11, 17, 21]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: 'temurin'
+    
+    - name: Cache Maven packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+    
+    - name: Run tests
+      run: mvn clean test
+    
+    - name: Build application
+      run: mvn clean package
+    
+    - name: Test ccwc functionality
+      run: |
+        echo "Testing ccwc functionality..."
+        echo "line1" > test_ci.txt
+        echo "line2" >> test_ci.txt
+        
+        # Test byte count
+        java -jar target/ccwc-1.0.0.jar -c test_ci.txt
+        
+        # Test line count
+        java -jar target/ccwc-1.0.0.jar -l test_ci.txt
+        
+        # Test word count
+        java -jar target/ccwc-1.0.0.jar -w test_ci.txt
+        
+        # Test default behavior
+        java -jar target/ccwc-1.0.0.jar test_ci.txt
+        
+        # Test stdin support
+        cat test_ci.txt | java -jar target/ccwc-1.0.0.jar -l
+        
+        echo "✅ All tests passed!"
