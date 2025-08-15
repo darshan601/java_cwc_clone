@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -147,7 +148,7 @@ public class FileAnalysisServiceImplTest {
         // Create a test file with multibyte characters
         Path testFile = tempDir.resolve("multibyte_test.txt");
         String content = "Hello 🌍!"; // 9 Unicode code points
-        Files.write(testFile, content.getBytes());
+        Files.write(testFile, content.getBytes(StandardCharsets.UTF_8));
 
         CcwcOptions options =
                 CcwcOptions.builder().countCharacters(true).filename(testFile.toString()).build();
